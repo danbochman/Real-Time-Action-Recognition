@@ -11,8 +11,15 @@ The main added feature of this repository is adding an inference method to the n
 You can click the image to view the demo video ^
 
 ## Usage
+
+### Prerequisites
+Please note that this is a repository was built on **Python 2.7**.
+Unfortunately, at the time of creating this repo, I did not have the best Git protocols and haven't made a proper requirements.txt - My apologies.
+
+### Training
 If you want to train the model from scratch you need to download the UCF-101 data, I recommend visiting Jefferey's Huang repository linked above and follow his detailed instructions.
 
+### Inference
 If you just want to run inference download the pre-trained model here:  
 [Link to ResNet101 trained on UCF-101](https://drive.google.com/drive/folders/1gVB5StqgoDJ3IxHUn7zoTzTNxzz3du3d?usp=sharing)
 
@@ -23,6 +30,7 @@ python spatial_cnn_gpu --resume /PATH/TO/model_best.pth.tar --demo
 You can run a cpu only version just by changing the script's name to spatial_cnn_cpu.py
 The best real-time results come from running only the Spatial CNN without the Temporal Stream on a GPU
 
+### Pre-trained Weights
 We didn't include the pre-trained weights to the Non-Local-Network version because we didn't observe any improvement in performance by adding the Non-Local Blocks (NLBs).
 We believe that very big batch-sizes are required for NLBs to contribute to the precision's score, which we didn't have the resources for.
 
