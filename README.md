@@ -13,7 +13,7 @@ You can click the image to view the demo video ^
 ## Usage
 
 ### Prerequisites
-Please note that this is a repository was built on **Python 2.7**.
+Please note that this is repository was built on **Python 2.7**.
 Unfortunately, at the time of creating this repo, I did not have the best Git protocols and haven't made a proper requirements.txt - My apologies.
 
 ### Training
