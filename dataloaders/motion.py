@@ -1,3 +1,4 @@
+import pickle
 import random
 
 import torch
@@ -8,8 +9,9 @@ from torch.utils.data import Dataset, DataLoader
 from split_train_test_video import *
 
 
-class motion_dataset(Dataset):
+class MotionDataset(Dataset):
     def __init__(self, dic, in_channel, root_dir, mode, transform=None):
+        super(MotionDataset, self).__init__()
         # Generate a 16 Frame clip
         self.keys = dic.keys()
         self.values = dic.values()
@@ -74,21 +76,21 @@ class motion_dataset(Dataset):
         return sample
 
 
-class Motion_DataLoader():
+class MotionDataloader(object):
     def __init__(self, BATCH_SIZE, num_workers, in_channel, path, ucf_list, ucf_split):
-
+        super(MotionDataloader, self).__init__()
         self.BATCH_SIZE = BATCH_SIZE
         self.num_workers = num_workers
         self.frame_count = {}
         self.in_channel = in_channel
         self.data_path = path
         # split the training and testing videos
-        splitter = UCF101_splitter(path=ucf_list, split=ucf_split)
+        splitter = UCF101Splitter(path=ucf_list, split=ucf_split)
         self.train_video, self.test_video = splitter.split_video()
 
     def load_frame_count(self):
         # print '==> Loading frame number of each video'
-        with open(os.getcwd() + '/dataloader/dic/frame_count.pickle', 'rb') as file:
+        with open(os.getcwd() + '/dataloaders/dic/frame_count.pickle', 'rb') as file:
             dic_frame = pickle.load(file)
         file.close()
 
@@ -128,13 +130,13 @@ class Motion_DataLoader():
             self.dic_video_train[key] = self.train_video[video]
 
     def train(self):
-        training_set = motion_dataset(dic=self.dic_video_train, in_channel=self.in_channel, root_dir=self.data_path,
-                                      mode='train',
-                                      transform=transforms.Compose([
-                                          transforms.Scale([224, 224]),
-                                          transforms.ToTensor(),
-                                      ]))
-        print '==> Training data :', len(training_set), ' videos', training_set[1][0].size()
+        training_set = MotionDataset(dic=self.dic_video_train, in_channel=self.in_channel, root_dir=self.data_path,
+                                     mode='train',
+                                     transform=transforms.Compose([
+                                         transforms.Scale([224, 224]),
+                                         transforms.ToTensor(),
+                                     ]))
+        print('==> Training data :', len(training_set), ' videos', training_set[1][0].size())
 
         train_loader = DataLoader(
             dataset=training_set,
@@ -147,13 +149,13 @@ class Motion_DataLoader():
         return train_loader
 
     def val(self):
-        validation_set = motion_dataset(dic=self.dic_test_idx, in_channel=self.in_channel, root_dir=self.data_path,
-                                        mode='val',
-                                        transform=transforms.Compose([
-                                            transforms.Scale([224, 224]),
-                                            transforms.ToTensor(),
-                                        ]))
-        print '==> Validation data :', len(validation_set), ' frames', validation_set[1][1].size()
+        validation_set = MotionDataset(dic=self.dic_test_idx, in_channel=self.in_channel, root_dir=self.data_path,
+                                       mode='val',
+                                       transform=transforms.Compose([
+                                           transforms.Scale([224, 224]),
+                                           transforms.ToTensor(),
+                                       ]))
+        print('==> Validation data :', len(validation_set), ' frames', validation_set[1][1].size())
         # print validation_set[1]
 
         val_loader = DataLoader(
@@ -166,10 +168,10 @@ class Motion_DataLoader():
 
 
 if __name__ == '__main__':
-    data_loader = Motion_DataLoader(BATCH_SIZE=1, num_workers=1, in_channel=10,
-                                    path='/home/ubuntu/data/UCF101/tvl1_flow/',
-                                    ucf_list='/home/ubuntu/cvlab/pytorch/ucf101_two_stream/github/UCF_data_references/',
-                                    ucf_split='01'
-                                    )
+    data_loader = MotionDataloader(BATCH_SIZE=1, num_workers=1, in_channel=10,
+                                   path='/home/ubuntu/data/UCF101/tvl1_flow/',
+                                   ucf_list='/home/ubuntu/cvlab/pytorch/ucf101_two_stream/github/UCF_data_references/',
+                                   ucf_split='01'
+                                   )
     train_loader, val_loader, test_video = data_loader.run()
     # print train_loader,val_loader

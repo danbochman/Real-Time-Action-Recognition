@@ -1,5 +1,8 @@
-import dataloader
+import pickle
 
+import numpy as np
+
+import dataloaders
 from utils.utils import *
 
 if __name__ == '__main__':
@@ -14,10 +17,10 @@ if __name__ == '__main__':
         opf = pickle.load(f)
     f.close()
 
-    dataloader = dataloader.spatial_dataloader(BATCH_SIZE=1, num_workers=1,
-                                               path='/home/ubuntu/data/UCF101/spatial_no_sampled/',
-                                               ucf_list='/home/ubuntu/cvlab/pytorch/ucf101_two_stream/github/UCF_data_references/',
-                                               ucf_split='01')
+    dataloader = dataloaders.spatial.SpatialDataloader(BATCH_SIZE=1, num_workers=1,
+                                                path='/home/ubuntu/data/UCF101/spatial_no_sampled/',
+                                                ucf_list='/UCF_data_references/',
+                                                ucf_split='01')
     train_loader, val_loader, test_video = dataloader.run()
 
     video_level_preds = np.zeros((len(rgb.keys()), 101))
@@ -41,4 +44,4 @@ if __name__ == '__main__':
 
     top1, top5 = accuracy(video_level_preds, video_level_labels, topk=(1, 5))
 
-    print top1, top5
+    print(top1, top5)

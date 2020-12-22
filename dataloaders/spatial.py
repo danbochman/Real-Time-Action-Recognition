@@ -8,7 +8,7 @@ from torch.utils.data import Dataset, DataLoader
 from split_train_test_video import *
 
 
-class spatial_dataset(Dataset):
+class SpatialDataset(Dataset):
     def __init__(self, dic, root_dir, mode, transform=None):
 
         self.keys = dic.keys()
@@ -70,20 +70,20 @@ class spatial_dataset(Dataset):
         return sample
 
 
-class spatial_dataloader():
+class SpatialDataloader(object):
     def __init__(self, BATCH_SIZE, num_workers, path, ucf_list, ucf_split):
-
+        super(SpatialDataloader, self).__init__()
         self.BATCH_SIZE = BATCH_SIZE
         self.num_workers = num_workers
         self.data_path = path
         self.frame_count = {}
         # split the training and testing videos
-        splitter = UCF101_splitter(path=ucf_list, split=ucf_split)
+        splitter = UCF101Splitter(path=ucf_list, split=ucf_split)
         self.train_video, self.test_video = splitter.split_video()
 
     def load_frame_count(self):
         # print '==> Loading frame number of each video'
-        with open(os.getcwd() + '/dataloader/dic/frame_count.pickle', 'rb') as file:
+        with open(os.getcwd() + '/dataloaders/dic/frame_count.pickle', 'rb') as file:
             dic_frame = pickle.load(file)
         file.close()
 
@@ -113,7 +113,7 @@ class spatial_dataloader():
             self.dic_training[key] = self.train_video[video]
 
     def val_sample20(self):
-        print '==> sampling testing frames'
+        print('==> sampling testing frames')
         self.dic_testing = {}
         for video in self.test_video:
             nb_frame = self.frame_count[video] - 10 + 1
@@ -124,15 +124,15 @@ class spatial_dataloader():
                 self.dic_testing[key] = self.test_video[video]
 
     def train(self):
-        training_set = spatial_dataset(dic=self.dic_training, root_dir=self.data_path, mode='train',
-                                       transform=transforms.Compose([
-                                           transforms.RandomCrop(224),
-                                           transforms.RandomHorizontalFlip(),
-                                           transforms.ToTensor(),
-                                           transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-                                       ]))
-        print '==> Training data :', len(training_set), 'frames'
-        print training_set[1][0]['img1'].size()
+        training_set = SpatialDataset(dic=self.dic_training, root_dir=self.data_path, mode='train',
+                                      transform=transforms.Compose([
+                                          transforms.RandomCrop(224),
+                                          transforms.RandomHorizontalFlip(),
+                                          transforms.ToTensor(),
+                                          transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+                                      ]))
+        print('==> Training data :', len(training_set), 'frames')
+        print(training_set[1][0]['img1'].size())
 
         train_loader = DataLoader(
             dataset=training_set,
@@ -142,15 +142,15 @@ class spatial_dataloader():
         return train_loader
 
     def validate(self):
-        validation_set = spatial_dataset(dic=self.dic_testing, root_dir=self.data_path, mode='val',
-                                         transform=transforms.Compose([
-                                             transforms.Scale([224, 224]),
-                                             transforms.ToTensor(),
-                                             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-                                         ]))
+        validation_set = SpatialDataset(dic=self.dic_testing, root_dir=self.data_path, mode='val',
+                                        transform=transforms.Compose([
+                                            transforms.Scale([224, 224]),
+                                            transforms.ToTensor(),
+                                            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+                                        ]))
 
-        print '==> Validation data :', len(validation_set), 'frames'
-        print validation_set[1][1].size()
+        print('==> Validation data :', len(validation_set), 'frames')
+        print(validation_set[1][1].size())
 
         val_loader = DataLoader(
             dataset=validation_set,
@@ -161,8 +161,8 @@ class spatial_dataloader():
 
 
 if __name__ == '__main__':
-    dataloader = spatial_dataloader(BATCH_SIZE=1, num_workers=1,
-                                    path='/home/ubuntu/data/UCF101/spatial_no_sampled/',
-                                    ucf_list='/home/ubuntu/cvlab/pytorch/ucf101_two_stream/github/UCF_data_references/',
-                                    ucf_split='01')
+    dataloader = SpatialDataloader(BATCH_SIZE=1, num_workers=1,
+                                   path='/home/ubuntu/data/UCF101/spatial_no_sampled/',
+                                   ucf_list='/home/ubuntu/cvlab/pytorch/ucf101_two_stream/github/UCF_data_references/',
+                                   ucf_split='01')
     train_loader, val_loader, test_video = dataloader.run()

@@ -18,10 +18,8 @@ If you just want to run inference download the pre-trained model here:
 
 Then run
 ```
-python spatial_cnn_gpu --resume /PATH/TO/model_best.pth.tar --demo
+python spatial_cnn --resume /PATH/TO/model_best.pth.tar --demo
 ```
-You can run a cpu only version just by changing the script's name to spatial_cnn_cpu.py
-The best real-time results come from running only the Spatial CNN without the Temporal Stream on a GPU
 
 We didn't include the pre-trained weights to the Non-Local-Network version because we didn't observe any improvement in performance by adding the Non-Local Blocks (NLBs).
 We believe that very big batch-sizes are required for NLBs to contribute to the precision's score, which we didn't have the resources for.
